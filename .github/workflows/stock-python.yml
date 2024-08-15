@@ -1,0 +1,40 @@
+name: stock-python
+
+on:
+  repository_dispatch:
+    types: [huawei_event]
+  workflow_dispatch:
+
+jobs:
+  run-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests akshare pandas numpy tqdm mootdx openpyxl | tee install_dependencies.log
+
+      - name: Download Python script from WebDAV
+        env:
+          WEBDAV_ID: ${{ secrets.WEBDAV_ID }}
+          WEBDAV_PASSWORD: ${{ secrets.WEBDAV_PASSWORD }}
+        run: python download-and-unzip.py
+
+      - name: Run Python
+        run: python run-all-files.py | tee run_python.log
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: |
+            install_dependencies.log
+            run_python.log
