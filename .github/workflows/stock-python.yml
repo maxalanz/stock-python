@@ -29,14 +29,6 @@ jobs:
 
       - name: Run Python
         run: python run-all-files.py | tee run_python.log
-        
-      - name: Commit and push files
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: 'GitHub Actions'
-          author_email: 'actions@github.com'
-          message: 'Add generated files from script'
-          add: 'historical-data.pkl'
 
       - name: Upload logs
         if: always()
